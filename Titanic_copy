@@ -1,0 +1,62 @@
+import sqlite3
+
+connection = sqlite3.connect('books.sql')
+import pandas as pd
+
+pd.options.display.max_columns = 10
+pd.read_sql("SELECT * FROM authors", connection, index_col=["id"])
+## Section 1: SELECT
+import pandas as pd
+
+pd.read_sql("SELECT first, last FROM authors",connection)
+## Section 2: WHERE
+pd.read_sql("""SELECT title,edition, copyright FROM titles WHERE copyright > '2016'""",connection)
+pd.read_sql("""SELECT id, first, last
+            FROM authors
+            WHERE last LIKE 'D%'""",
+            connection, index_col=["id"])
+pd.read_sql("""SELECT id, first, last
+            FROM authors
+            where first LIKE '_b%'""", 
+            connection, index_col=["id"])
+## Section 3: ORDER
+pd.read_sql("SELECT title FROM titles ORDER BY title ASC", connection)
+pd.read_sql("""SELECT id,first,last
+            FROM authors
+            ORDER BY last,first""",
+            connection, index_col=["id"])
+pd.read_sql("""SELECT id,first,last
+            FROM authors
+            ORDER BY last DESC, first ASC""", 
+            connection, index_col=["id"])
+pd.read_sql("""SELECT isbn, title, edition, copyright
+            FROM titles
+            WHERE title LIKE '%How to Program'
+            ORDER BY title""", 
+            connection)
+## Section 4: INNER JOIN
+pd.read_sql("""SELECT first, last, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+             ON authors.id = author_ISBN.id
+            ORDER BY last, first""", 
+            connection).head()
+## Section 5: INSERT INTO
+cursor =connection.cursor()
+
+cursor = cursor.execute("""INSERT INTO authors (first, last) VALUES ("Sue", "Red")""")
+pd.read_sql("SELECT id, first,last FROM authors", 
+            connection, index_col=["id"])
+## Section 6: UPDATE
+cursor = cursor.execute("""UPDATE authors SET last='Black'
+                        WHERE last='Red' AND first='Sue'""")
+pd.read_sql("SELECT id, first, last FROM authors", connection, index_col = ["id"])
+## Section 7: DELETE FROM
+cursor = cursor.execute("DELETE FROM authors WHERE id=6")
+pd.read_sql("SELECT id,first,last FROM authors", connection, index_col = ["id"])
+## Section 8: SELECT
+pd.options.display.max_columns = 10
+
+pd.read_sql("SELECT * FROM authors", connection, index_col=["id"])
+pd.read_sql("SELECT * FROM titles", connection)
+pd.read_sql("SELECT * FROM author_ISBN", connection)
